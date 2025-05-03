@@ -1,65 +1,112 @@
-<script>
-  function calculate() {
-    const num1Field = document.getElementById("num1");
-    const num2Field = document.getElementById("num2");
-    const num1 = parseFloat(num1Field.value);
-    const num2 = parseFloat(num2Field.value);
-    const operator = document.getElementById("operator").value;
-    let result;
-
-    const resultDiv = document.getElementById("result");
-
-    if (num1Field.value.trim() === "" || num2Field.value.trim() === "") {
-      resultDiv.textContent = "Both fields are required.";
-      resultDiv.style.color = "red";
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dedi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
     }
-
-    if (isNaN(num1) || isNaN(num2)) {
-      resultDiv.textContent = "Please enter valid numbers.";
-      resultDiv.style.color = "red";
-      return;
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
     }
+    #result {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
 
-    switch (operator) {
-      case '+':
-        result = num1 + num2;
-        resultDiv.style.color = "black";
-        break;
-      case '-':
-        result = num1 - num2;
-        resultDiv.style.color = "black";
-        break;
-      case '*':
-        result = num1 * num2;
-        resultDiv.style.color = "black";
-        break;
-      case '/':
-        if (num2 !== 0) {
-          result = num1 / num2;
-          resultDiv.style.color = "black";
-        } else {
-          result = "Cannot divide by zero.";
-          resultDiv.style.color = "red";
-        }
-        break;
-      default:
-        result = "Invalid operator.";
+  <h1>Dedi</h1>
+
+  <input type="number" id="num1" placeholder="First number">
+  <select id="operator">
+    <option value="+">+</option>
+    <option value="-">−</option>
+    <option value="*">×</option>
+    <option value="/">÷</option>
+  </select>
+  <input type="number" id="num2" placeholder="Second number">
+  <br>
+  <button onclick="calculate()">Calculate</button>
+  <button onclick="resetCalculator()">Reset</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      const num1Field = document.getElementById("num1");
+      const num2Field = document.getElementById("num2");
+      const num1 = parseFloat(num1Field.value);
+      const num2 = parseFloat(num2Field.value);
+      const operator = document.getElementById("operator").value;
+      const resultDiv = document.getElementById("result");
+      let result;
+
+      // Validate empty inputs
+      if (num1Field.value.trim() === "" || num2Field.value.trim() === "") {
+        resultDiv.textContent = "Both fields are required.";
         resultDiv.style.color = "red";
+        return;
+      }
+
+      // Validate numeric input
+      if (isNaN(num1) || isNaN(num2)) {
+        resultDiv.textContent = "Please enter valid numbers.";
+        resultDiv.style.color = "red";
+        return;
+      }
+
+      // Perform calculation
+      switch (operator) {
+        case '+':
+          result = num1 + num2;
+          resultDiv.style.color = "black";
+          break;
+        case '-':
+          result = num1 - num2;
+          resultDiv.style.color = "black";
+          break;
+        case '*':
+          result = num1 * num2;
+          resultDiv.style.color = "black";
+          break;
+        case '/':
+          if (num2 !== 0) {
+            result = num1 / num2;
+            resultDiv.style.color = "black";
+          } else {
+            result = "Cannot divide by zero.";
+            resultDiv.style.color = "red";
+          }
+          break;
+        default:
+          result = "Invalid operator.";
+          resultDiv.style.color = "red";
+      }
+
+      resultDiv.textContent = `Result: ${result}`;
     }
 
-    resultDiv.textContent = `Result: ${result}`;
-  }
-
-  function resetCalculator() {
-    document.getElementById("num1").value = "";
-    document.getElementById("num2").value = "";
-    document.getElementById("result").textContent = "";
-  }
-
-  document.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      calculate();
+    function resetCalculator() {
+      document.getElementById("num1").value = "";
+      document.getElementById("num2").value = "";
+      document.getElementById("result").textContent = "";
     }
-  });
-</script>
+
+    // Allow Enter key to trigger calculation
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        calculate();
+      }
+    });
+  </script>
+
+</body>
+</html>
