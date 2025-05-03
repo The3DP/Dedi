@@ -1,1 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neon Math Calculator</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #0ff;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding-top: 80px;
+    }
 
+    h1 {
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    }
+
+    input, select, button {
+      padding: 12px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      background-color: #1a1a1a;
+      color: #0ff;
+      box-shadow: 0 0 10px #0ff, 0 0 20px #0ff inset;
+      transition: 0.3s;
+    }
+
+    input:focus, select:focus {
+      box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff inset;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #111;
+      box-shadow: 0 0 12px #f0f, 0 0 22px #f0f inset;
+      color: #f0f;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      box-shadow: 0 0 18px #ff00ff, 0 0 28px #ff00ff inset;
+      background-color: #222;
+      color: #fff;
+    }
+
+    #result {
+      font-size: 22px;
+      color: #0f0;
+      margin-top: 20px;
+      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Neon Math Calculator</h1>
+
+  <input type="number" id="num1" placeholder="First number">
+  <select id="operator">
+    <option value="+">+</option>
+    <option value="-">−</option>
+    <option value="*">×</option>
+    <option value="/">÷</option>
+  </select>
+  <input type="number" id="num2" placeholder="Second number">
+  <br>
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      const num1 = parseFloat(document.getElementById("num1").value);
+      const num2 = parseFloat(document.getElementById("num2").value);
+      const operator = document.getElementById("operator").value;
+      let result;
+
+      if (isNaN(num1) || isNaN(num2)) {
+        result = "Please enter valid numbers.";
+      } else {
+        switch (operator) {
+          case '+':
+            result = num1 + num2;
+            break;
+          case '-':
+            result = num1 - num2;
+            break;
+          case '*':
+            result = num1 * num2;
+            break;
+          case '/':
+            result = num2 !== 0 ? num1 / num2 : "Cannot divide by zero.";
+            break;
+          default:
+            result = "Invalid operator.";
+        }
+      }
+
+      document.getElementById("result").textContent = `Result: ${result}`;
+    }
+  </script>
+
+</body>
+</html>
