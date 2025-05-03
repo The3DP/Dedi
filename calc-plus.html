@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neon Math Calculator</title>
+  <style>
+    /* Background Animation */
+    body {
+      background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+      animation: backgroundPulse 8s ease-in-out infinite alternate;
+      font-family: 'Courier New', monospace;
+      color: #0ff;
+      text-align: center;
+      padding-top: 80px;
+    }
+
+    @keyframes backgroundPulse {
+      0% { background-color: #0d0d0d; }
+      100% { background-color: #1a1a1a; }
+    }
+
+    h1 {
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+      margin-bottom: 40px;
+    }
+
+    input, select, button {
+      padding: 12px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      background-color: #1a1a1a;
+      color: #0ff;
+      box-shadow: 0 0 10px #0ff, 0 0 20px #0ff inset;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff inset;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #111;
+      box-shadow: 0 0 15px #f0f, 0 0 25px #f0f inset;
+      color: #f0f;
+      font-weight: bold;
+    }
+
+    button:hover {
+      box-shadow: 0 0 25px #ff00ff, 0 0 35px #ff00ff inset;
+      background-color: #222;
+      color: #fff;
+    }
+
+    #result {
+      font-size: 24px;
+      color: #0f0;
+      margin-top: 30px;
+      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+      transition: transform 0.3s ease;
+    }
+
+    #result.active {
+      transform: scale(1.1);
+    }
+
+    /* Neon Border Box */
+    .calculator-box {
+      display: inline-block;
+      padding: 30px;
+      border: 2px solid #0ff;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #0ff, 0 0 50px #0ff;
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from {
+        box-shadow: 0 0 20px #0ff, 0 0 30px #0ff;
+      }
+      to {
+        box-shadow: 0 0 30px #0ff, 0 0 60px #0ff;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Neon Math Calculator</h1>
+
+  <div class="calculator-box">
+    <input type="number" id="num1" placeholder="First number">
+    <select id="operator">
+      <option value="+">+</option>
+      <option value="-">−</option>
+      <option value="*">×</option>
+      <option value="/">÷</option>
+    </select>
+    <input type="number" id="num2" placeholder="Second number">
+    <br>
+    <button onclick="calculate()">💡 Calculate</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- Sound Effects -->
+  <audio id="clickSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+  <audio id="errorSound" src="https://www.soundjay.com/button/beep-10.wav" preload="auto"></audio>
+
+  <script>
+    const clickSound = document.getElementById("clickSound");
+    const errorSound = document.getElementById("errorSound");
+
+    function calculate() {
+      const num1 = parseFloat(document.getElementById("num1").value);
+      const num2 = parseFloat(document.getElementById("num2").value);
+      const operator = document.getElementById("operator").value;
+      const resultDiv = document.getElementById("result");
+      let result;
+
+      if (isNaN(num1) || isNaN(num2)) {
+        resultDiv.textContent = "Please enter valid numbers.";
+        errorSound.play();
+        return;
+      }
+
+      switch (operator) {
+        case '+':
+          result = num1 + num2;
+          break;
+        case '-':
+          result = num1 - num2;
+          break;
+        case '*':
+          result = num1 * num2;
+          break;
+        case '/':
+          result = num2 !== 0 ? num1 / num2 : "Cannot divide by zero.";
+          if (num2 === 0) errorSound.play();
+          break;
+        default:
+          result = "Invalid operator.";
+      }
+
+      resultDiv.textContent = `Result: ${result}`;
+      resultDiv.classList.add("active");
+      setTimeout(() => resultDiv.classList.remove("active"), 300);
+      if (typeof result === "number") clickSound.play();
+    }
+
+    // Keyboard support
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        calculate();
+      }
+    });
+  </script>
+
+</body>
+</html>
