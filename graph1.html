@@ -1,1 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dedi Graph</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 0;
+        }
+        .title {
+            font-size: 36px;
+        }
+        .green {
+            color: green;
+        }
+        .blue {
+            color: darkblue;
+        }
+        #inputSection {
+            margin: 20px;
+        }
+        #graph {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+        input {
+            width: 300px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
 
+    <h1 class="title">
+        <span class="green">Dedi</span>
+        <span class="blue">Graph</span>
+    </h1>
+
+    <div id="inputSection">
+        <input type="text" id="functionInput" placeholder="Enter function, e.g. sin(x), x^2">
+        <button onclick="plotGraph()">Plot</button>
+    </div>
+
+    <div id="graph"></div>
+
+    <script>
+        function plotGraph() {
+            const expr = document.getElementById('functionInput').value;
+            const xValues = [];
+            const yValues = [];
+            const mathParser = math;
+
+            try {
+                const compiled = mathParser.compile(expr);
+
+                for (let x = -10; x <= 10; x += 0.1) {
+                    const y = compiled.evaluate({ x });
+                    xValues.push(x);
+                    yValues.push(y);
+                }
+
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    type: 'scatter',
+                    line: { color: 'darkblue' }
+                };
+
+                Plotly.newPlot('graph', [trace], {
+                    margin: { t: 20 },
+                    xaxis: { title: 'x' },
+                    yaxis: { title: 'f(x)' }
+                });
+            } catch (err) {
+                alert("Invalid function. Use 'x' as the variable.");
+            }
+        }
+    </script>
+
+    <!-- Include Math.js for parsing expressions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+
+</body>
+</html>
