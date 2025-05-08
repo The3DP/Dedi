@@ -1,1 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dedi Graph</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
 
+        h1.title {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .green { color: green; }
+        .blue { color: darkblue; }
+
+        #inputSection {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: navy;
+        }
+
+        #graph {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        #errorMsg {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .history {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 4px;
+        }
+
+        .history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .history li {
+            margin: 5px 0;
+        }
+
+        .history button {
+            background-color: transparent;
+            color: darkblue;
+            border: none;
+            cursor: pointer;
+        }
+
+        .history button:hover {
+            text-decoration: underline;
+        }
+
+        .theme-toggle {
+            margin-top: 20px;
+            cursor: pointer;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .theme-toggle:hover {
+            background-color: #555;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+
+        body.dark-mode input[type="text"] {
+            background-color: #555;
+            color: white;
+            border: 1px solid #777;
+        }
+
+        body.dark-mode button {
+            background-color: #444;
+            color: white;
+        }
+
+        body.dark-mode button:hover {
+            background-color: #666;
+        }
+
+        body.dark-mode .history {
+            background-color: #444;
+            border: 1px solid #555;
+        }
+
+        body.dark-mode .history button {
+            color: lightblue;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="title">
+        <span class="green">Dedi</span> <span class="blue">Graph</span>
+    </h1>
+
+    <div id="inputSection">
+        <label for="functionInput">Function(s) f(x):</label>
+        <input type="text" id="functionInput" placeholder="e.g., sin(x), cos(x), x^2">
+        <button onclick="plotGraph()">Plot</button>
+        <button onclick="clearGraph()">Clear</button>
+    </div>
+
+    <div id="errorMsg" role="alert" aria-live="assertive"></div>
+    <div id="graph"></div>
+
+    <div class="history">
+        <h3>Function History</h3>
+        <ul id="historyList"></ul>
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
+
+    <script>
+        const input = document.getElementById('functionInput');
+        const errorMsg = document.getElementById('errorMsg');
+        const historyList = document.getElementById('historyList');
+        const history = JSON.parse(localStorage.getItem('functionHistory')) || [];
+
+        // Focus input on load
+        input.focus();
+
+        // Allow pressing Enter to plot
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') plotGraph();
+        });
+
+        // Load history from localStorage
+        function loadHistory() {
+            historyList.innerHTML = '';
+            history.forEach((func, index) => {
+                const li = document.createElement('li');
+                li.textContent = func;
+                const button = document.createElement('button');
+                button.textContent = 'Plot';
+                button.onclick = () => {
+                    input.value = func;
+                    plotGraph();
+                };
+                li.appendChild(button);
+                historyList.appendChild(li);
+            });
+        }
+
+        // Save history to localStorage
+        function saveHistory() {
+            localStorage.setItem('functionHistory', JSON.stringify(history));
+        }
+
+        // Plot the graph
+        function plotGraph() {
+            const expr = input.value.trim();
+            const xValues = [];
+            const yValues = [];
+            errorMsg.textContent = '';
+
+            if (!expr) {
+                errorMsg.textContent = "Please enter a function.";
+                return;
+            }
+
+            try {
+                const compiled = math.compile(expr);
+                for (let x = -10; x <= 10; x += 0.1) {
+                    const y = compiled.evaluate({ x });
+                    xValues.push(x);
+                    yValues.push(y);
+                }
+
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    type: 'scatter',
+                    name: expr,
+                    line: { color: 'darkblue' }
+                };
+
+                Plotly.newPlot('graph', [trace], {
+                    margin: { t: 30 },
+                    xaxis: { title: 'x' },
+                    yaxis: { title: 'f(x)' },
+                    responsive: true
+                });
+
+                // Add to history
+::contentReference[oaicite:0]{index=0}
+ 
