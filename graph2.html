@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dedi Graph</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Plotly.js and Math.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
 
+        h1.title {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .green { color: green; }
+        .blue { color: darkblue; }
+
+        #inputSection {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: navy;
+        }
+
+        #graph {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        #errorMsg {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="title">
+        <span class="green">Dedi</span> <span class="blue">Graph</span>
+    </h1>
+
+    <div id="inputSection">
+        <label for="functionInput">Function f(x):</label>
+        <input type="text" id="functionInput" placeholder="e.g., sin(x), x^2" aria-label="Function input">
+        <button onclick="plotGraph()">Plot</button>
+    </div>
+
+    <div id="errorMsg" role="alert" aria-live="assertive"></div>
+    <div id="graph"></div>
+
+    <script>
+        const input = document.getElementById('functionInput');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Focus input on load
+        input.focus();
+
+        // Allow pressing Enter to plot
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') plotGraph();
+        });
+
+        function plotGraph() {
+            const expr = input.value.trim();
+            const xValues = [], yValues = [];
+            errorMsg.textContent = '';
+
+            if (!expr) {
+                errorMsg.textContent = "Please enter a function.";
+                return;
+            }
+
+            try {
+                const compiled = math.compile(expr);
+                for (let x = -10; x <= 10; x += 0.1) {
+                    const y = compiled.evaluate({ x });
+                    xValues.push(x);
+                    yValues.push(y);
+                }
+
+                const trace = {
+                    x: xValues,
+                    y: yValues,
+                    mode: 'lines',
+                    type: 'scatter',
+                    line: { color: 'darkblue' }
+                };
+
+                Plotly.newPlot('graph', [trace], {
+                    margin: { t: 30 },
+                    xaxis: { title: 'x' },
+                    yaxis: { title: 'f(x)' },
+                    responsive: true
+                });
+            } catch (err) {
+                errorMsg.textContent = "Invalid function. Use 'x' as the variable.";
+            }
+        }
+    </script>
+
+</body>
+</html>
